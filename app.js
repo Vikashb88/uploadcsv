@@ -3,8 +3,8 @@ var app = angular.module('app', ['ngAnimate', 'ngTouch', 'ui.grid', 'ui.grid.imp
 app.controller('MainCtrl', ['$scope', '$http', '$interval', '$q', function ($scope, $http, $interval, $q) {
   $scope.title = 'Upload CSV'
   $scope.data = [];
+  $scope.fileName = '';
   $scope.gridOptions = {
-    rowHeight: 45,
     enableGridMenu: true,
     importerDataAddCallback: function( grid, newObjects ) {
       $scope.data = $scope.data.concat( newObjects );
@@ -16,22 +16,22 @@ app.controller('MainCtrl', ['$scope', '$http', '$interval', '$q', function ($sco
     data: 'data'
   };
 
-  $scope.gridOptions.columnDefs = [{
-    name: 'First_Name'
-  }, {
-    name: 'Last_Name'
-  },{
-    name: 'Email'
-  },{
-    name: 'Client_ID'
-  },{
-    name: 'Health_plan'
-  },{
-    name: 'Role'
-  }, {
-    name: 'Delete',
-    cellTemplate: '<button class="btn btn-danger" ng-click="grid.appScope.deleteRow(row)">Delete</button>'
-  }];
+  $scope.save = function () {
+    $scope.fileInfo = {
+      STG_EXT_USER_FILE_INFO : {
+        FILE_NAME : $scope.fileName
+      }
+    };
+
+    $scope.userInfo = {
+      STG_EXT_USER_INFO : $scope.data
+    };
+
+    $scope.finalObject = {
+      INSERT_STG_USER : angular.extend($scope.fileInfo, $scope.userInfo)
+    };
+    console.log(angular.toJson($scope.finalObject, true));
+  }
 
   $scope.saveRow = function( rowEntity ) {
     var promise = $q.defer();
@@ -48,6 +48,7 @@ app.controller('MainCtrl', ['$scope', '$http', '$interval', '$q', function ($sco
     var target = event.srcElement || event.target;
     if (target && target.files && target.files.length === 1) {
       var fileObject = target.files[0];
+      $scope.fileName = fileObject.name;
       $scope.gridApi.importer.importFile( fileObject );
       target.form.reset();
     }
