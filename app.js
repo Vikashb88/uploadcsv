@@ -4,6 +4,7 @@ app.controller('MainCtrl', ['$scope', '$http', '$interval', '$q', function ($sco
   $scope.title = 'Upload CSV'
   $scope.data = [];
   $scope.gridOptions = {
+    rowHeight: 45,
     enableGridMenu: true,
     importerDataAddCallback: function( grid, newObjects ) {
       $scope.data = $scope.data.concat( newObjects );
@@ -15,29 +16,32 @@ app.controller('MainCtrl', ['$scope', '$http', '$interval', '$q', function ($sco
     data: 'data'
   };
 
-  //$scope.gridOptions.columnDefs = [{
-  //  name: 'First_Name'
-  //}, {
-  //  name: 'Last_Name'
-  //},{
-  //  name: 'Email'
-  //},{
-  //  name: 'Client_ID'
-  //},{
-  //  name: ''
-  //},{
-  //  name: 'Role'
-  //}, {
-  //  name: 'Delete',
-  //  cellTemplate: '<button class="btn primary" ng-click="grid.appScope.deleteRow(row)">Delete</button>'
-  //}];
+  $scope.gridOptions.columnDefs = [{
+    name: 'First_Name'
+  }, {
+    name: 'Last_Name'
+  },{
+    name: 'Email'
+  },{
+    name: 'Client_ID'
+  },{
+    name: 'Health_plan'
+  },{
+    name: 'Role'
+  }, {
+    name: 'Delete',
+    cellTemplate: '<button class="btn btn-danger" ng-click="grid.appScope.deleteRow(row)">Delete</button>'
+  }];
 
   $scope.saveRow = function( rowEntity ) {
     var promise = $q.defer();
     $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
-    $interval( function() {
-        promise.resolve();
-    }, 2000, 1);
+    promise.resolve();
+  };
+
+  $scope.deleteRow = function(row) {
+    var index = $scope.data.indexOf(row.entity);
+    $scope.data.splice(index, 1);
   };
 
   var handleFileSelect = function( event ){
